@@ -61,16 +61,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// -------
 		photos = new ArrayList<Uri>();
 //		Debug.waitForDebugger();
-		File directorio = new File("/mnt/sdcard/photowidget/");
-		if(!directorio.exists()){
-			Log.e("PhotoWidget", "No existe el directorio de fotos en la sd");
-		}else{
-			File[] files = directorio.listFiles();
-			for(File f : files){
-				String filePath = f.getAbsolutePath();
-				photos.add(Uri.parse(filePath));
-			}
-		}
+		onDataSetChanged();
 	}
 
 	@Override
@@ -166,5 +157,16 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// in its current state while work is being done here, so you don't need
 		// to worry about
 		// locking up the widget.
+		photos.clear();
+		File directorio = new File("/mnt/sdcard/photowidget/");
+		if(!directorio.exists()){
+			Log.e("PhotoWidget", "No existe el directorio de fotos en la sd");
+		}else{
+			File[] files = directorio.listFiles();
+			for(File f : files){
+				String filePath = f.getAbsolutePath();
+				photos.add(Uri.parse(filePath));
+			}
+		}
 	}
 }
