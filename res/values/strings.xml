@@ -3,6 +3,6 @@
 
     <string name="hello">Hello World, PhotoWidgetActivity!</string>
     <string name="app_name">PhotoWidget</string>
-     <string name="empty_view_text">This is the empty view</string>	
+     <string name="empty_view_text">No hay imágenes que mostrar\nAñádelas en la carpeta PhotoWidget en la raíz de la SD</string>	
 
 </resources>
