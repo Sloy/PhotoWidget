@@ -1,9 +1,9 @@
 <values>
-    <row table="fuente-carpeta" id="1">
+    <row table="fuentes-carpeta" id="1">
         <field name="nombre" value="Por defecto" />
         <field name="direccion" value="/mnt/sdcard/PhotoWidget/" />
     </row>
-    <row table="fuente-carpeta" id="2">
+    <row table="fuentes-carpeta" id="2">
         <field name="nombre" value="Cámara" />
         <field name="direccion" value="/mnt/sdcard/DCIM/Camera/" />
     </row>
