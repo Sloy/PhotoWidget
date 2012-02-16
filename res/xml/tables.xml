@@ -1,0 +1,6 @@
+<database name="photowidget_db" version="1">
+    <table name="fuente-carpeta" to-string="Fuente carpeta: %nombre%">
+        <field name="nombre" obligatory="true" type="text" size="128"/>
+        <field name="direccion" obligatory="true" type="text"/>
+    </table>
+</database>
