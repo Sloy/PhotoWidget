@@ -111,19 +111,19 @@ public class FuentesListFragment extends ListFragment {
 				db = DataFramework.getInstance();
 				db.open(context, context.getPackageName());
 
-				/*
-				 * db.emptyTables();
-				 * Entity e = new Entity("fuentes_carpeta");
-				 * e.setValue("nombre", "Default");
-				 * e.setValue("direccion", "/mnt/sdcard/PhotoWidget/");
-				 * e.save();
-				 * e = new Entity("fuentes_carpeta");
-				 * e.setValue("nombre", "Cámara");
-				 * e.setValue("direccion", "/mnt/sdcard/DCIM/Camera/");
-				 * e.save();
-				 */
-
 				mFuentes = db.getEntityList("fuentes_carpeta");
+				if(mFuentes.size() == 0){
+					db.emptyTables();
+					Entity e = new Entity("fuentes_carpeta");
+					e.setValue("nombre", "Default");
+					e.setValue("direccion", "/mnt/sdcard/PhotoWidget/");
+					e.save();
+					e = new Entity("fuentes_carpeta");
+					e.setValue("nombre", "Cámara");
+					e.setValue("direccion", "/mnt/sdcard/DCIM/Camera/");
+					e.save();
+					mFuentes = db.getEntityList("fuentes_carpeta");
+				}
 			}catch(Exception e){
 				Log.e("PhotoWidget", "Error cargando la lista de fuentes", e);
 			}
@@ -164,7 +164,7 @@ public class FuentesListFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		v.setBackgroundColor(0x220000FF);
+		v.setBackgroundColor(0x22FF0000);
 		return v;
 	}
 
