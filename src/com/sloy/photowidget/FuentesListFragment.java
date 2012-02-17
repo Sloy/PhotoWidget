@@ -98,7 +98,7 @@ public class FuentesListFragment extends ListFragment {
 		}
 	}
 
-	private class FuentesAdapter extends BaseAdapter {
+	public class FuentesAdapter extends BaseAdapter {
 
 		List<Entity> mFuentes;
 		Context mContext;
