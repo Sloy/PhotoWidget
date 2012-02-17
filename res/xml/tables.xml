@@ -1,9 +1,9 @@
 <database name="photowidget_db" version="1">
-    <table name="fuentes_carpeta" to-string="Fuente carpeta: %nombre%">
+    <table name="fuentes_carpeta" to-string="%nombre%">
         <field name="nombre" obligatory="true" type="text" size="128"/>
         <field name="direccion" obligatory="true" type="text"/>
     </table>
-    <table name="widgets" to-string="Widget: %widgetid%">
+    <table name="widgets" to-string="%widgetid%">
         <field name="widgetid" obligatory="true" type="integer"/>
         <field name="fuente" obligatory="true" type="foreign-key" foreign-table="fuentes_carpeta"/>
     </table>
