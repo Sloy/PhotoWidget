@@ -33,6 +33,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public void onCreate() {
+		Log.d("PhotoWidgetService", "onCreate");
 		// In onCreate() you setup any connections / cursors to your data
 		// source. Heavy lifting,
 		// for example downloading or creating content etc, should be deferred
@@ -66,6 +67,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public void onDestroy() {
+		Log.d("PhotoWidgetService", "onDestroy");
 		// In onDestroy() you should tear down anything that was setup for your
 		// data source,
 		// eg. cursors, connections, etc.
@@ -79,6 +81,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public RemoteViews getViewAt(int position) {
+		Log.d("PhotoWidgetService", "getViewAt");
 		// position will always range from 0 to getCount() - 1.
 
 		// We construct a remote views item based on our widget item xml file,
@@ -146,6 +149,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public void onDataSetChanged() {
+		Log.d("PhotoWidgetService", "onDataSetChanged");
 		// This is triggered when you call AppWidgetManager
 		// notifyAppWidgetViewDataChanged
 		// on the collection view corresponding to this factory. You can do

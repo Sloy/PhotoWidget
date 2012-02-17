@@ -39,7 +39,6 @@ public class PhotoWidgetActivity extends Activity {
 	public class TabListener implements ActionBar.TabListener {
 		private Fragment mFragment;
 		private Activity mActivity;
-		private TabType mTabType;
 		private final String mTag;
 		private final TabType mClass;
 		private final Bundle mArgs;
@@ -73,42 +72,6 @@ public class PhotoWidgetActivity extends Activity {
 			}else{
 				ft.attach(mFragment);
 			}
-			//
-			/*
-			 * Fragment present =
-			 * getFragmentManager().findFragmentById(R.id.titles);
-			 * if(mFragment == null){
-			 * switch (mTabType){
-			 * case FUENTES:
-			 * mFragment = Fragment.instantiate(mActivity,
-			 * FuentesListFragment.class.getName());
-			 * break;
-			 * case WIDGETS:
-			 * mFragment = Fragment.instantiate(mActivity,
-			 * WidgetListFragment.class.getName());
-			 * break;
-			 * }
-			 * }
-			 * ft.remove(present);
-			 * ft.replace(R.id.titles, mFragment);
-			 * Fragment fragment = null;
-			 * switch (mTabType){
-			 * case FUENTES:
-			 * if(!(present instanceof FuentesListFragment)){
-			 * fragment = Fragment.instantiate(mActivity,
-			 * FuentesListFragment.class.getName());
-			 * }
-			 * break;
-			 * case WIDGETS:
-			 * if(!(present instanceof WidgetListFragment)){
-			 * fragment = Fragment.instantiate(mActivity,
-			 * WidgetListFragment.class.getName());
-			 * }
-			 * break;
-			 * }
-			 * if(fragment != null){
-			 * }
-			 */
 
 		}
 

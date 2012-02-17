@@ -8,6 +8,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -17,21 +18,25 @@ public class StackWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
+    	Log.d("PhotoWidget", "onDeleted");
         super.onDeleted(context, appWidgetIds);
     }
 
     @Override
     public void onDisabled(Context context) {
+    	Log.d("PhotoWidget", "onDisabled");
         super.onDisabled(context);
     }
 
     @Override
     public void onEnabled(Context context) {
+    	Log.d("PhotoWidget", "onEnabled");
         super.onEnabled(context);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
+    	Log.d("PhotoWidget", "onReceive");
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
         if (intent.getAction().equals(TOAST_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
@@ -44,7 +49,8 @@ public class StackWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        // update each of the widgets with the remote adapter
+    	Log.d("PhotoWidget", "onUpdate");
+    	// update each of the widgets with the remote adapter
         for (int i = 0; i < appWidgetIds.length; ++i) {
 
             // Here we setup the intent which points to the StackViewService which will
