@@ -7,9 +7,9 @@
     <fragment
         android:id="@+id/titles"
         android:layout_width="0px"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        class="com.sloy.photowidget.PhotoWidgetActivity$TitlesFragment" />
+        class="com.sloy.photowidget.FuentesListFragment" />
 
     <FrameLayout
         android:id="@+id/details"
