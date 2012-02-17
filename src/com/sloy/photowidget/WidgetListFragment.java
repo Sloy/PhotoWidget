@@ -120,7 +120,7 @@ public class WidgetListFragment extends ListFragment {
 					e.setValue("direccion", "/mnt/sdcard/DCIM/Camera/");
 					e.save();*/
 					
-					mWidgets = db.getEntityList("fuentes_carpeta");
+					mWidgets = db.getEntityList("widgets");
 				}catch(Exception e){
 					Log.e("PhotoWidget", "Error cargando la lista de fuentes", e);
 				}
@@ -131,7 +131,11 @@ public class WidgetListFragment extends ListFragment {
 
 			@Override
 			public int getCount() {
-				return mWidgets.size()-1;
+				if(mWidgets!=null){
+					return mWidgets.size();
+				}else{
+					return 0;
+				}
 			}
 
 			@Override
@@ -151,7 +155,7 @@ public class WidgetListFragment extends ListFragment {
 		        View v = View.inflate(mContext, android.R.layout.simple_list_item_activated_1, null);
 
 		        TextView lTitle = (TextView)v.findViewById(android.R.id.text1);
-		        lTitle.setText("yeso"+item.getString("nombre"));
+		        lTitle.setText(item.getString("widgetid"));
 
 		        return v;
 			}
