@@ -19,4 +19,4 @@ En cualquier caso, para guardar cambios y actualizar las imágenes del widget rec
 * Desarrollo:
 En el repositorio hay 2 ramas principales. Master, donde irán la versiones "estables" (y todo tipo de alfa), y dev donde iré subiendo los cambios que vaya haciendo conforme desarrollo. 
 
-* Funciona únicamente en Honeycomb y ICS. Desarrollado y "optimizado" para tablets, aunque en móviles también debe funcionar.
+* Funciona únicamente en Honeycomb y Ice Cream Sandwich. Desarrollado y "optimizado" para tablets, aunque en móviles con ICS también debe funcionar.
