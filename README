@@ -1,0 +1,22 @@
+¡¡ADVERTENCIA!!
+===============
+Esto es una versión de prueba no ya alfa, sino pre-alfa. Tiene mogollón de bugs, cosas que no funcionan, y funcionalidades aún no implementadas.
+Úsalo bajo tu propia responsabilidad. Si encuentras fallos puedes abrir Issues aquí mismo en GitHub, o comentármelo directamente por alguna de las vías que seguro se te ocurren.
+Si detectas que el rendimiento de tu dispositivo empeora drásticamente devido al widget házmelo saber.
+
+* Descarga:
+Para descargar la última versión disponible mira en la sección de descargas del proyecto, ahí deberías encontrar los APK de la aplicación.
+( https://github.com/Sloy/PhotoWidget/downloads )
+
+* Funcionamiento:
+La aplicación consiste en un widget y una pantalla de configuración.
+En la segunda puedes configurar las fuentes de imágenes (actualmente sólo carpetas de la memoria del teléfono) y las fuentes asignadas a cada widget.
+Por defecto temporalmente se crean 2 fuentes. Una para las fotos de la cámara y otra para una carpeta en la sd, PhotoWidget. Puedes crear esta carpeta para poner imágenes de prueba, o cambiar la dirección de la fuente.
+Por defecto al crear un widget se usa la primera fuente. Puedes cambiarla en la pantalla de configuración, segunda pestaña. 
+
+En cualquier caso, para guardar cambios y actualizar las imágenes del widget recomiendo abrir el widget correspondiente en la pantalla de configuración y pulsar el botón guardar. Sólo así se asegura que el widget recargue.
+
+* Desarrollo:
+En el repositorio hay 2 ramas principales. Master, donde irán la versiones "estables" (y todo tipo de alfa), y dev donde iré subiendo los cambios que vaya haciendo conforme desarrollo. 
+
+* Funciona únicamente en Honeycomb y ICS. Desarrollado y "optimizado" para tablets, aunque en móviles también debe funcionar.
