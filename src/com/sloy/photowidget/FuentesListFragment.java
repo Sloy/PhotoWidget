@@ -46,7 +46,7 @@ public class FuentesListFragment extends ListFragment {
 			// item.
 			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 			// Make sure our UI is in the correct state.
-			// showDetails(mCurCheckPosition);
+			 showDetails(mCurCheckPosition);
 		}
 	}
 
@@ -75,7 +75,13 @@ public class FuentesListFragment extends ListFragment {
 			getListView().setItemChecked(index, true);
 
 			// Check what fragment is currently shown, replace if needed.
-			ConfigCarpetaFragment details = (ConfigCarpetaFragment)getFragmentManager().findFragmentById(R.id.details);
+			ConfigCarpetaFragment details;
+			try{
+				details = (ConfigCarpetaFragment)getFragmentManager().findFragmentById(R.id.details);
+			}catch(ClassCastException ex){
+				details = null;
+			}
+			
 			if(details == null || details.getShownIndex() != index){
 				// Make new fragment to show this selection.
 				details = ConfigCarpetaFragment.newInstance(index, mAdapter.getItem(index));
