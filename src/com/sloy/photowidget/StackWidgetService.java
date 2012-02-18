@@ -3,6 +3,8 @@ package com.sloy.photowidget;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -77,7 +79,27 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 		// ---------------
 		Uri foto = photos.get(position);
-		rv.setImageViewUri(R.id.widget_item, foto);
+		Bitmap bitmap = BitmapFactory.decodeFile(foto.toString());
+		int maxvalue = 500;
+//		Debug.waitForDebugger();
+		// Coge las dimensiones de la imagen
+		int x = bitmap.getWidth();
+		int y = bitmap.getHeight();
+		int xP = x, yP = y; // iguales por defecto
+		// Calcula el nuevo tamaño
+		if(x > y){
+			// Mayor es X
+			xP = maxvalue;
+			yP = y * xP / x;
+		}else{
+			// Mayor es Y (o son iguales)
+			yP = maxvalue;
+			xP = x * yP / y;
+		}
+		bitmap = Bitmap.createScaledBitmap(bitmap, xP, yP, false);
+
+		// rv.setImageViewUri(R.id.widget_item, foto);
+		rv.setImageViewBitmap(R.id.widget_item, bitmap);
 		// --------------------
 
 		// Next, we set a fill-intent which will be used to fill-in the pending
