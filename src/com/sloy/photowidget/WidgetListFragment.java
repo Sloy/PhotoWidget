@@ -46,7 +46,10 @@ public class WidgetListFragment extends ListFragment {
 			// item.
 			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 			// Make sure our UI is in the correct state.
-			 showDetails(mCurCheckPosition);
+			 
+			if(mAdapter.getCount()>0){
+				showDetails(mCurCheckPosition);
+			}
 		}
 	}
 
