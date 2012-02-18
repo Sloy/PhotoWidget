@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Debug;
 import android.util.Log;
 
 import com.android.dataframework.DataFramework;
@@ -19,7 +18,6 @@ public class WidgetSetupActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setResult(RESULT_CANCELED);
 		Bundle extras = getIntent().getExtras();
-		Debug.waitForDebugger();
 		if(extras != null){
 			mWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
 		}
