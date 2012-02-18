@@ -9,6 +9,9 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.android.dataframework.DataFramework;
+import com.android.dataframework.Entity;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,41 +36,21 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public void onCreate() {
-		Log.d("PhotoWidgetService", "onCreate");
+		Log.d("PhotoWidgetService", "onCreate " + mAppWidgetId);
 		// In onCreate() you setup any connections / cursors to your data
 		// source. Heavy lifting,
 		// for example downloading or creating content etc, should be deferred
 		// to onDataSetChanged()
 		// or getViewAt(). Taking more than 20 seconds in this call will result
 		// in an ANR.
-		/*
-		 * for (int i = 0; i < mCount; i++) {
-		 * mWidgetItems.add(new WidgetItem(i + "!"));
-		 * }
-		 */
-
-		// We sleep for 3 seconds here to show how the empty view appears in the
-		// interim.
-		// The empty view is set in the StackWidgetProvider and should be a
-		// sibling of the
-		// collection view.
-		/*
-		 * try {
-		 * Thread.sleep(3000);
-		 * } catch (InterruptedException e) {
-		 * e.printStackTrace();
-		 * }
-		 */
 
 		// -------
 		photos = new ArrayList<Uri>();
-//		Debug.waitForDebugger();
-		onDataSetChanged();
 	}
 
 	@Override
 	public void onDestroy() {
-		Log.d("PhotoWidgetService", "onDestroy");
+		Log.d("PhotoWidgetService", "onDestroy " + mAppWidgetId);
 		// In onDestroy() you should tear down anything that was setup for your
 		// data source,
 		// eg. cursors, connections, etc.
@@ -81,13 +64,13 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public RemoteViews getViewAt(int position) {
-		Log.d("PhotoWidgetService", "getViewAt");
+		Log.d("PhotoWidgetService", "getViewAt " + mAppWidgetId + "(" + position + ")");
 		// position will always range from 0 to getCount() - 1.
 
 		// We construct a remote views item based on our widget item xml file,
 		// and set the
 		// text based on the position.
-//		Debug.waitForDebugger();
+		// Debug.waitForDebugger();
 		RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
 		// rv.setTextViewText(R.id.widget_item,
 		// mWidgetItems.get(position).text);
@@ -113,12 +96,14 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// synchronously. A loading view will show up in lieu of the actual
 		// contents in the
 		// interim.
-		/*try{
-			System.out.println("Loading view " + position);
-			Thread.sleep(500);
-		}catch(InterruptedException e){
-			e.printStackTrace();
-		}*/
+		/*
+		 * try{
+		 * System.out.println("Loading view " + position);
+		 * Thread.sleep(500);
+		 * }catch(InterruptedException e){
+		 * e.printStackTrace();
+		 * }
+		 */
 
 		// Return the remote views object.
 		return rv;
@@ -149,7 +134,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public void onDataSetChanged() {
-		Log.d("PhotoWidgetService", "onDataSetChanged");
+		Log.d("PhotoWidgetService", "onDataSetChanged " + mAppWidgetId);
 		// This is triggered when you call AppWidgetManager
 		// notifyAppWidgetViewDataChanged
 		// on the collection view corresponding to this factory. You can do
@@ -162,7 +147,19 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// to worry about
 		// locking up the widget.
 		photos.clear();
-		File directorio = new File("/mnt/sdcard/photowidget/");
+
+		File directorio = null;
+
+		DataFramework db = null;
+		try{
+			db = DataFramework.getInstance();
+			db.open(mContext, mContext.getPackageName());
+			Entity widg = db.getTopEntity("widgets", "widgetid = " + mAppWidgetId, null);
+			Entity fuente = db.getTopEntity("fuentes_carpeta", "_id=" + widg.getInt("fuente"), null);
+			directorio = new File(fuente.getString("direccion"));
+		}catch(Exception tr){
+			Log.e("PhotoWidgetService", "Error obteniendo fuente del widget " + mAppWidgetId, tr);
+		}
 		if(!directorio.exists()){
 			Log.e("PhotoWidget", "No existe el directorio de fotos en la sd");
 		}else{
