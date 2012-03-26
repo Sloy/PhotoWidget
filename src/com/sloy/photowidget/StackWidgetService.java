@@ -33,11 +33,8 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 	private Context mContext;
 	private int mAppWidgetId;
 	private List<String> photos;
-	private Map<String, Bitmap> bitmaps;
-	
-	Integer i=0;
-
-	Bitmap tmpBitmap;
+	private Map<String, Bitmap> bitmapsCache;
+	private Bitmap tmpBitmap;
 
 	public StackRemoteViewsFactory(Context context, Intent intent) {
 		mContext = context;
@@ -56,7 +53,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 		// -------
 		photos = new ArrayList<String>();
-		bitmaps = new HashMap<String, Bitmap>();
+		bitmapsCache = new HashMap<String, Bitmap>();
 	}
 
 	@Override
@@ -79,9 +76,6 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// position will always range from 0 to getCount() - 1.
 
 		// We construct a remote views item based on our widget item xml file,
-		// and set the
-		// text based on the position.
-		// Debug.waitForDebugger();
 		RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
 		// rv.setTextViewText(R.id.widget_item,
 		// mWidgetItems.get(position).text);
@@ -89,9 +83,9 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// ---------------
 
 		String foto = photos.get(position);
-		if(bitmaps.containsKey(foto)){
+		if(bitmapsCache.containsKey(foto)){
 			// ya la tengo lista
-			tmpBitmap = bitmaps.get(foto);
+			tmpBitmap = bitmapsCache.get(foto);
 		}else{
 			// tengo que prepararla
 			// TODO si hay un nullpointerexception porque alguna foto ya no
@@ -118,9 +112,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 			// TODO Bitmap.compress (or not)
 			// guarda el bitmap
-//			bitmaps.put(foto, tmpBitmap);
-			bitmaps.put(i.toString(), tmpBitmap);
-			i++;
+			bitmapsCache.put(foto, tmpBitmap);
 		}
 
 		rv.setImageViewBitmap(R.id.widget_item, tmpBitmap);
