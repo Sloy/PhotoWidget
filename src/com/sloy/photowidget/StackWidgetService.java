@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -15,8 +14,12 @@ import com.android.dataframework.DataFramework;
 import com.android.dataframework.Entity;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StackWidgetService extends RemoteViewsService {
 	@Override
@@ -29,7 +32,12 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 	// private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
 	private Context mContext;
 	private int mAppWidgetId;
-	private List<Uri> photos;
+	private List<String> photos;
+	private Map<String, Bitmap> bitmaps;
+	
+	Integer i=0;
+
+	Bitmap tmpBitmap;
 
 	public StackRemoteViewsFactory(Context context, Intent intent) {
 		mContext = context;
@@ -47,7 +55,8 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// in an ANR.
 
 		// -------
-		photos = new ArrayList<Uri>();
+		photos = new ArrayList<String>();
+		bitmaps = new HashMap<String, Bitmap>();
 	}
 
 	@Override
@@ -78,28 +87,43 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// mWidgetItems.get(position).text);
 
 		// ---------------
-		Uri foto = photos.get(position);
-		Bitmap bitmap = BitmapFactory.decodeFile(foto.toString());
-		int maxvalue = 500;
-//		Debug.waitForDebugger();
-		// Coge las dimensiones de la imagen
-		int x = bitmap.getWidth();
-		int y = bitmap.getHeight();
-		int xP = x, yP = y; // iguales por defecto
-		// Calcula el nuevo tamaño
-		if(x > y){
-			// Mayor es X
-			xP = maxvalue;
-			yP = y * xP / x;
-		}else{
-			// Mayor es Y (o son iguales)
-			yP = maxvalue;
-			xP = x * yP / y;
-		}
-		bitmap = Bitmap.createScaledBitmap(bitmap, xP, yP, false);
 
-		// rv.setImageViewUri(R.id.widget_item, foto);
-		rv.setImageViewBitmap(R.id.widget_item, bitmap);
+		String foto = photos.get(position);
+		if(bitmaps.containsKey(foto)){
+			// ya la tengo lista
+			tmpBitmap = bitmaps.get(foto);
+		}else{
+			// tengo que prepararla
+			// TODO si hay un nullpointerexception porque alguna foto ya no
+			// está, recarga la lista de fotos
+			tmpBitmap = decodeFile(foto);
+//			tmpBitmap = BitmapFactory.decodeFile(foto);
+
+			int maxvalue = 500;
+			// Coge las dimensiones de la imagen
+			int x = tmpBitmap.getWidth();
+			int y = tmpBitmap.getHeight();
+			int xP = x, yP = y; // iguales por defecto
+			// Calcula el nuevo tamaño
+			if(x > y){
+				// Mayor es X
+				xP = maxvalue;
+				yP = y * xP / x;
+			}else{
+				// Mayor es Y (o son iguales)
+				yP = maxvalue;
+				xP = x * yP / y;
+			}
+			tmpBitmap = Bitmap.createScaledBitmap(tmpBitmap, xP, yP, false);
+
+			// TODO Bitmap.compress (or not)
+			// guarda el bitmap
+//			bitmaps.put(foto, tmpBitmap);
+			bitmaps.put(i.toString(), tmpBitmap);
+			i++;
+		}
+
+		rv.setImageViewBitmap(R.id.widget_item, tmpBitmap);
 		// --------------------
 
 		// Next, we set a fill-intent which will be used to fill-in the pending
@@ -129,6 +153,37 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 		// Return the remote views object.
 		return rv;
+	}
+
+	private Bitmap decodeFile(String fp) {
+		Bitmap b = null;
+		try{
+			// Get the file
+			File f = new File(fp);
+			// Decode image size
+			BitmapFactory.Options o = new BitmapFactory.Options();
+			o.inJustDecodeBounds = true;
+
+			FileInputStream fis = new FileInputStream(f);
+			BitmapFactory.decodeStream(fis, null, o);
+			fis.close();
+
+			int scale = 1;
+			int IMAGE_MAX_SIZE = 700; // TODO global
+			if(o.outHeight > IMAGE_MAX_SIZE || o.outWidth > IMAGE_MAX_SIZE){
+				scale = (int)Math.pow(2, (int)Math.round(Math.log(IMAGE_MAX_SIZE / (double)Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
+			}
+
+			// Decode with inSampleSize
+			BitmapFactory.Options o2 = new BitmapFactory.Options();
+			o2.inSampleSize = scale;
+			fis = new FileInputStream(f);
+			b = BitmapFactory.decodeStream(fis, null, o2);
+			fis.close();
+		}catch(IOException e){
+			Log.e("photowidget", "Error cargando la foto " + fp, e);
+		}
+		return b;
 	}
 
 	@Override
@@ -188,7 +243,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 			File[] files = directorio.listFiles();
 			for(File f : files){
 				String filePath = f.getAbsolutePath();
-				photos.add(Uri.parse(filePath));
+				photos.add(filePath);
 			}
 		}
 	}
