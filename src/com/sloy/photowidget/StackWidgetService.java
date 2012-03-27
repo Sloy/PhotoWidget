@@ -88,10 +88,15 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 			tmpBitmap = bitmapsCache.get(foto);
 		}else{
 			// tengo que prepararla
-			// TODO si hay un nullpointerexception porque alguna foto ya no
-			// está, recarga la lista de fotos
-			tmpBitmap = decodeFile(foto);
-//			tmpBitmap = BitmapFactory.decodeFile(foto);
+			
+			try{
+				tmpBitmap = decodeFile(foto);
+			}catch(NullPointerException e){
+				// si hay un nullpointerexception porque alguna foto ya no
+				// está, recarga la lista de fotos
+				onDataSetChanged();
+			}
+			// tmpBitmap = BitmapFactory.decodeFile(foto);
 
 			int maxvalue = 500;
 			// Coge las dimensiones de la imagen
@@ -109,8 +114,6 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 				xP = x * yP / y;
 			}
 			tmpBitmap = Bitmap.createScaledBitmap(tmpBitmap, xP, yP, false);
-
-			// TODO Bitmap.compress (or not)
 			// guarda el bitmap
 			bitmapsCache.put(foto, tmpBitmap);
 		}
@@ -217,26 +220,14 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// locking up the widget.
 		photos.clear();
 
-		File directorio = null;
-
 		DataFramework db = null;
 		try{
 			db = DataFramework.getInstance();
 			db.open(mContext, mContext.getPackageName());
 			Entity widg = db.getTopEntity("widgets", "widgetid = " + mAppWidgetId, null);
-			Entity fuente = db.getTopEntity("fuentes_carpeta", "_id=" + widg.getInt("fuente"), null);
-			directorio = new File(fuente.getString("direccion"));
+			photos = ProviderHelper.getPhotosFromAlbum(mContext, widg.getString("acceso_fuente"));
 		}catch(Exception tr){
 			Log.e("PhotoWidgetService", "Error obteniendo fuente del widget " + mAppWidgetId, tr);
-		}
-		if(!directorio.exists()){
-			Log.e("PhotoWidget", "No existe el directorio de fotos en la sd");
-		}else{
-			File[] files = directorio.listFiles();
-			for(File f : files){
-				String filePath = f.getAbsolutePath();
-				photos.add(filePath);
-			}
 		}
 	}
 }
