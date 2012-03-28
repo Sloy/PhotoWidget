@@ -28,7 +28,7 @@ public class WidgetSetupActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.config_screen);
 		//Widget stuff
 		setResult(RESULT_CANCELED);
 		Bundle extras = getIntent().getExtras();
