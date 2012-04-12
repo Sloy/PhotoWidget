@@ -1,5 +1,6 @@
 package com.sloy.photowidget;
 
+import android.app.ActivityManager;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.LruCache;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -14,9 +16,7 @@ import com.android.dataframework.DataFramework;
 import com.android.dataframework.Entity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class StackWidgetService extends RemoteViewsService {
 	@Override
@@ -30,7 +30,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 	private Context mContext;
 	private int mAppWidgetId;
 	private List<String> photos;
-	private Map<String, Bitmap> bitmapsCache;
+	private LruCache<String, Bitmap> bitmapsCache;
 	private Bitmap tmpBitmap;
 
 	public StackRemoteViewsFactory(Context context, Intent intent) {
@@ -50,7 +50,22 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 		// -------
 		photos = new ArrayList<String>();
-		bitmapsCache = new HashMap<String, Bitmap>();
+
+		// Calcula la memoria máxima
+		final int memClass = ((ActivityManager)mContext.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+		Log.d("PhotoWidget", "Máxima memoria: " + memClass);
+		
+		// Usa el 75% del espacio máximo para la caché
+		final int cacheSize = (int)(1024 * 1024 * (memClass * 0.75));
+
+		bitmapsCache = new LruCache<String, Bitmap>(cacheSize) {
+			@Override
+			protected int sizeOf(String key, Bitmap bitmap) {
+				// The cache size will be measured in bytes rather than number
+				// of items.
+				return bitmap.getByteCount();
+			}
+		};
 	}
 
 	@Override
@@ -60,7 +75,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// data source,
 		// eg. cursors, connections, etc.
 		photos.clear();
-		bitmapsCache.clear();
+		bitmapsCache.evictAll();
 	}
 
 	@Override
@@ -147,7 +162,8 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	public Bitmap getBitmap(String nombre) {
 		Bitmap res = null;
-		if(bitmapsCache.containsKey(nombre)){
+		res = getBitmapFromMemCache(nombre);
+		if(res!=null){
 			// ya la tengo lista
 			Log.v("PhotoWidgetService", "Cached");
 			res = bitmapsCache.get(nombre);
@@ -155,17 +171,27 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 			Log.w("PhotoWidgetService", "New");
 			// tengo que prepararla
 			// TODO comprobar que el archivo exista y actualizar la lista si no
-			
-			//calcula las dimensiones máximas adecuadas para el dispositivo
+
+			// calcula las dimensiones máximas adecuadas para el dispositivo
 			int maxvalue = 500;
-			
-			//Obtiene la imagen
+
+			// Obtiene la imagen
 			res = decodeSampledBitmapFromFile(nombre, maxvalue, maxvalue);
-			
+
 			// guarda el bitmap
-			bitmapsCache.put(nombre, res);
+			addBitmapToMemoryCache(nombre, res);
 		}
 		return res;
+	}
+	
+	public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
+	    if (getBitmapFromMemCache(key) == null) {
+	        bitmapsCache.put(key, bitmap);
+	    }
+	}
+
+	public Bitmap getBitmapFromMemCache(String key) {
+	    return bitmapsCache.get(key);
 	}
 
 	/*
