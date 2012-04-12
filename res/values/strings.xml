@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">PhotoWidget</string>
-      <string name="version_name">0.1 beta</string>
+      <string name="version_name">0.2 beta</string>
      <string name="empty_view_text">No hay imágenes que mostrar en la carpeta correspondiente al widget</string>	
 	<string name="welcome">Bienvenido a PhotoWidget (por ahora).
 	    \nPara crear un widget de fotos, pues bueno... crea el widget como se crea cualquier otro widget, cabesa. Por ahora sólo podrás seleccionar entre álbumes de fotos del móvil. Selecciona uno y... pues nada, disfruta :P
