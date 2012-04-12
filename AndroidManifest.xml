@@ -2,9 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sloy.photowidget"
     android:versionCode="1"
-    android:versionName="alfa 1" >
+    android:versionName="@string/version_name" >
 
     <uses-sdk android:minSdkVersion="14" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:icon="@drawable/ic_launcher"
@@ -22,6 +23,8 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
+        </activity>
+        <activity android:name=".AutoUpdateActivity" >
         </activity>
 
         <receiver android:name=".StackWidgetProvider" >

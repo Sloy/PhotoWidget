@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World, PhotoWidgetActivity!</string>
     <string name="app_name">PhotoWidget</string>
-     <string name="empty_view_text">No hay imágenes que mostrar\nAñádelas en la carpeta PhotoWidget en la raíz de la SD</string>	
-
+      <string name="version_name">0.1 beta</string>
+     <string name="empty_view_text">No hay imágenes que mostrar en la carpeta correspondiente al widget</string>	
+	<string name="welcome">Bienvenido a PhotoWidget (por ahora).
+	    \nPara crear un widget de fotos, pues bueno... crea el widget como se crea cualquier otro widget, cabesa. Por ahora sólo podrás seleccionar entre álbumes de fotos del móvil. Selecciona uno y... pues nada, disfruta :P
+	    \n
+	    \nEs una beta no muy abierta, así que agradecería mucho feedback. Comentarios, sugerencias, peticiones... Por favor, hacedme llegar todo lo posible. Por mail, twitter, Google Plus, correo postal, señales de humo... 
+	    \n¡Gracias!</string>
 </resources>
