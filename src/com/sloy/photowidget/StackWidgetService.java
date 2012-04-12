@@ -13,9 +13,6 @@ import android.widget.RemoteViewsService;
 import com.android.dataframework.DataFramework;
 import com.android.dataframework.Entity;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,12 +21,12 @@ import java.util.Map;
 public class StackWidgetService extends RemoteViewsService {
 	@Override
 	public RemoteViewsFactory onGetViewFactory(Intent intent) {
+		Log.d("PhotoWidgetService", "--- Creando la factoría ---");
 		return new StackRemoteViewsFactory(this.getApplicationContext(), intent);
 	}
 }
 
 class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
-	// private List<WidgetItem> mWidgetItems = new ArrayList<WidgetItem>();
 	private Context mContext;
 	private int mAppWidgetId;
 	private List<String> photos;
@@ -63,6 +60,7 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		// data source,
 		// eg. cursors, connections, etc.
 		photos.clear();
+		bitmapsCache.clear();
 	}
 
 	@Override
@@ -72,55 +70,21 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
 	@Override
 	public RemoteViews getViewAt(int position) {
-		Log.d("PhotoWidgetService", "getViewAt " + mAppWidgetId + "(" + position + ")");
+		Log.i("PhotoWidgetService", "getViewAt " + "(" + position + ")");
 		// position will always range from 0 to getCount() - 1.
 
 		// We construct a remote views item based on our widget item xml file,
 		RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);
-		// rv.setTextViewText(R.id.widget_item,
-		// mWidgetItems.get(position).text);
 
-		// ---------------
-
+		// Obtiene la foto. Si está guardada en caché la cogerá de ahí, si no la
+		// creará
 		String foto = photos.get(position);
-		if(bitmapsCache.containsKey(foto)){
-			// ya la tengo lista
-			tmpBitmap = bitmapsCache.get(foto);
-		}else{
-			// tengo que prepararla
-			
-			try{
-				tmpBitmap = decodeFile(foto);
-			}catch(NullPointerException e){
-				// si hay un nullpointerexception porque alguna foto ya no
-				// está, recarga la lista de fotos
-				onDataSetChanged();
-			}
-			// tmpBitmap = BitmapFactory.decodeFile(foto);
+		tmpBitmap = getBitmap(foto);
 
-			int maxvalue = 500;
-			// Coge las dimensiones de la imagen
-			int x = tmpBitmap.getWidth();
-			int y = tmpBitmap.getHeight();
-			int xP = x, yP = y; // iguales por defecto
-			// Calcula el nuevo tamaño
-			if(x > y){
-				// Mayor es X
-				xP = maxvalue;
-				yP = y * xP / x;
-			}else{
-				// Mayor es Y (o son iguales)
-				yP = maxvalue;
-				xP = x * yP / y;
-			}
-			tmpBitmap = Bitmap.createScaledBitmap(tmpBitmap, xP, yP, false);
-			// guarda el bitmap
-			bitmapsCache.put(foto, tmpBitmap);
-		}
-
+		// Coloca la foto en el ImageView
 		rv.setImageViewBitmap(R.id.widget_item, tmpBitmap);
-		// --------------------
 
+		// Ahora hace la tontería de respuesta al hacer clic en la foto
 		// Next, we set a fill-intent which will be used to fill-in the pending
 		// intent template
 		// which is set on the collection view in StackWidgetProvider.
@@ -130,55 +94,8 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		fillInIntent.putExtras(extras);
 		rv.setOnClickFillInIntent(R.id.widget_item, fillInIntent);
 
-		// You can do heaving lifting in here, synchronously. For example, if
-		// you need to
-		// process an image, fetch something from the network, etc., it is ok to
-		// do it here,
-		// synchronously. A loading view will show up in lieu of the actual
-		// contents in the
-		// interim.
-		/*
-		 * try{
-		 * System.out.println("Loading view " + position);
-		 * Thread.sleep(500);
-		 * }catch(InterruptedException e){
-		 * e.printStackTrace();
-		 * }
-		 */
-
 		// Return the remote views object.
 		return rv;
-	}
-
-	private Bitmap decodeFile(String fp) {
-		Bitmap b = null;
-		try{
-			// Get the file
-			File f = new File(fp);
-			// Decode image size
-			BitmapFactory.Options o = new BitmapFactory.Options();
-			o.inJustDecodeBounds = true;
-
-			FileInputStream fis = new FileInputStream(f);
-			BitmapFactory.decodeStream(fis, null, o);
-			fis.close();
-
-			int scale = 1;
-			int IMAGE_MAX_SIZE = 700; // TODO global
-			if(o.outHeight > IMAGE_MAX_SIZE || o.outWidth > IMAGE_MAX_SIZE){
-				scale = (int)Math.pow(2, (int)Math.round(Math.log(IMAGE_MAX_SIZE / (double)Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
-			}
-
-			// Decode with inSampleSize
-			BitmapFactory.Options o2 = new BitmapFactory.Options();
-			o2.inSampleSize = scale;
-			fis = new FileInputStream(f);
-			b = BitmapFactory.decodeStream(fis, null, o2);
-			fis.close();
-		}catch(IOException e){
-			Log.e("photowidget", "Error cargando la foto " + fp, e);
-		}
-		return b;
 	}
 
 	@Override
@@ -209,17 +126,14 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 		Log.d("PhotoWidgetService", "onDataSetChanged " + mAppWidgetId);
 		// This is triggered when you call AppWidgetManager
 		// notifyAppWidgetViewDataChanged
-		// on the collection view corresponding to this factory. You can do
-		// heaving lifting in
-		// here, synchronously. For example, if you need to process an image,
-		// fetch something
-		// from the network, etc., it is ok to do it here, synchronously. The
-		// widget will remain
-		// in its current state while work is being done here, so you don't need
-		// to worry about
-		// locking up the widget.
-		photos.clear();
+		// on the collection view corresponding to this factory.
 
+		// Vacía la lista de fotos
+		photos.clear();
+		// TODO vacía la caché (o no...)
+
+		// Coge la lista de fotos según la configuración
+		// TODO modularizar esto, según el tipo de álbum y tal
 		DataFramework db = null;
 		try{
 			db = DataFramework.getInstance();
@@ -230,4 +144,96 @@ class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 			Log.e("PhotoWidgetService", "Error obteniendo fuente del widget " + mAppWidgetId, tr);
 		}
 	}
+
+	public Bitmap getBitmap(String nombre) {
+		Bitmap res = null;
+		if(bitmapsCache.containsKey(nombre)){
+			// ya la tengo lista
+			Log.v("PhotoWidgetService", "Cached");
+			res = bitmapsCache.get(nombre);
+		}else{
+			Log.w("PhotoWidgetService", "New");
+			// tengo que prepararla
+			// TODO comprobar que el archivo exista y actualizar la lista si no
+			
+			//calcula las dimensiones máximas adecuadas para el dispositivo
+			int maxvalue = 500;
+			
+			//Obtiene la imagen
+			res = decodeSampledBitmapFromFile(nombre, maxvalue, maxvalue);
+			
+			// guarda el bitmap
+			bitmapsCache.put(nombre, res);
+		}
+		return res;
+	}
+
+	/*
+	 * Using powers of 2 for inSampleSize values is faster and more efficient
+	 * for the decoder. However, if you plan to cache the resized versions in
+	 * memory or on disk, it’s usually still worth decoding to the most
+	 * appropriate image dimensions to save space.
+	 */
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+
+		if(height > reqHeight || width > reqWidth){
+			if(width > height){
+				inSampleSize = Math.round((float)height / (float)reqHeight);
+			}else{
+				inSampleSize = Math.round((float)width / (float)reqWidth);
+			}
+		}
+		return inSampleSize;
+	}
+
+	public static Bitmap decodeSampledBitmapFromFile(String pathName, int reqWidth, int reqHeight) {
+
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(pathName, options);
+
+		// Calculate inSampleSize
+		options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+		return BitmapFactory.decodeFile(pathName, options);
+	}
+
+	// My old method
+	/*
+	 * private Bitmap decodeFile(String fp) {
+	 * Bitmap b = null;
+	 * try{
+	 * // Get the file
+	 * File f = new File(fp);
+	 * // Decode image size
+	 * BitmapFactory.Options o = new BitmapFactory.Options();
+	 * o.inJustDecodeBounds = true;
+	 * FileInputStream fis = new FileInputStream(f);
+	 * BitmapFactory.decodeStream(fis, null, o);
+	 * fis.close();
+	 * int scale = 1;
+	 * int IMAGE_MAX_SIZE = 700; // TODO global
+	 * if(o.outHeight > IMAGE_MAX_SIZE || o.outWidth > IMAGE_MAX_SIZE){
+	 * scale = (int)Math.pow(2, (int)Math.round(Math.log(IMAGE_MAX_SIZE /
+	 * (double)Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
+	 * }
+	 * // Decode with inSampleSize
+	 * BitmapFactory.Options o2 = new BitmapFactory.Options();
+	 * o2.inSampleSize = scale;
+	 * fis = new FileInputStream(f);
+	 * b = BitmapFactory.decodeStream(fis, null, o2);
+	 * fis.close();
+	 * }catch(IOException e){
+	 * Log.e("photowidget", "Error cargando la foto " + fp, e);
+	 * }
+	 * return b;
+	 * }
+	 */
 }
